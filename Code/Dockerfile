@@ -20,4 +20,7 @@ RUN python download_stanza_model.py
 
 COPY . .
 WORKDIR .
+
+EXPOSE 8501
+
 CMD [ "streamlit", "run", "pipeline_st.py" ]

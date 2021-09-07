@@ -1,5 +1,19 @@
 The text below describes the steps to follow to be able to execute the code
 
+## Docker
+
+### Build image
+
+```
+docker build -t hubeau .
+```
+
+### Start a container
+
+```
+docker run -p 8501:8501 hubeau
+```
+
 ## Installation
 
 Create environment that runs python 3.7 with command
