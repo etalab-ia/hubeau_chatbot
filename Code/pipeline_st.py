@@ -270,14 +270,23 @@ def display_location(result, st):
 def display_stations(result, st):
     stations = result["stations"]
     st.header("Listes des stations de mesure:")
+
+    base_url = "https://hubeau.eaufrance.fr/sites/default/files/api/demo/piezo/piezo.htm?code_bss="
+    station_url = "https://ades.eaufrance.fr/Fiche/PtEau?Code="
     for insee, data in stations.items():
         st.subheader(
-            data["name"] + "(" + insee + ") : " + f"{data['nb_stations']} stations"
+            data["name"]
+            + "("
+            + insee
+            + ") : "
+            + f"[{data['nb_stations']} stations]({base_url}{','.join(data['stations'])})"
             if data["nb_stations"] > 0
             else ""
         )
         text = (
-            ", ".join(data["stations"])
+            ", ".join(
+                [f"[{station}]({station_url}{station})" for station in data["stations"]]
+            )
             if data["nb_stations"] > 0
             else "Aucune station de mesure"
         )
