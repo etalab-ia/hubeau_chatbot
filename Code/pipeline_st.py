@@ -5,30 +5,54 @@ from flair.models import SequenceTagger
 import stanza
 import streamlit as st
 
+st.set_page_config(page_title="Chatbot", layout="wide")
 
 MODEL_PATH = "stacked-standard-flair-150-wikiner.pt"
 nb_mesures = None
 
-flair_model = SequenceTagger.load(MODEL_PATH)
-nlp = stanza.Pipeline(
-    lang="fr", processors="tokenize,mwt,pos,lemma,depparse", logging_level="FATAL"
-)
-heideltime_parser = Heideltime()
-##################################################################################
 
-# Reading dataset of all location names
-communes_ = pd.read_csv("demonyms/Data/locations/commune2021.csv", encoding="utf-8")[
-    "LIBELLE"
-].tolist()
-departements_ = pd.read_csv(
-    "demonyms/Data/locations/departement2021.csv", encoding="utf-8"
-)["LIBELLE"].tolist()
-regions_ = pd.read_csv("demonyms/Data/locations/region2021.csv", encoding="utf-8")[
-    "LIBELLE"
-].tolist()
-all_locations = list(
-    map(replace, np.unique(np.concatenate((communes_, departements_, regions_))))
-)
+# @st.cache
+def load_tagger():
+    return SequenceTagger.load(MODEL_PATH)
+
+
+# @st.cache
+def load_nlp():
+    return stanza.Pipeline(
+        lang="fr", processors="tokenize,mwt,pos,lemma,depparse", logging_level="FATAL"
+    )
+
+
+# @st.cache
+def load_heideltime():
+    return Heideltime()
+
+
+flair_model = load_tagger()
+nlp = load_nlp()
+heideltime_parser = load_heideltime()
+
+
+# @st.cache
+def load_locations(path="demonyms/Data/locations"):
+    # Reading dataset of all location names
+    communes, departements, regions = map(
+        lambda f: pd.read_csv(f"{path}/{f}", encoding="utf-8")["LIBELLE"].tolist(),
+        [
+            "commune2021.csv",
+            "departement2021.csv",
+            "region2021.csv",
+        ],
+    )
+
+    locations = list(
+        map(replace, np.unique(np.concatenate((communes, departements, regions))))
+    )
+
+    return locations
+
+
+all_locations = load_locations()
 
 # Reading the dictionnary of demonyms
 demonym_dict = {
@@ -39,11 +63,16 @@ demonym_dict = {
     "regions": json.load(open("demonyms/Data/final/regs_stemmed_reversed.json")),
 }
 
-# Getting user's IP address
-with requests.get("https://geolocation-db.com/json") as url:
-    data = json.loads(url.text)
-    ip_address = data["IPv4"]
-st.set_page_config(page_title="Chatbot", layout="wide")
+
+def load_ipaddress():
+    # Getting user's IP address
+    with requests.get("https://geolocation-db.com/json") as url:
+        data = json.loads(url.text)
+        return data["IPv4"]
+
+
+ip_address = load_ipaddress()
+
 
 st.header("Hub'eau Chatbot")
 st.markdown(
@@ -295,7 +324,6 @@ def display_summary(result, st):
 
 
 if query != "" and submit_button:
-
     final_result = show_results(
         query,
         flair_model,
