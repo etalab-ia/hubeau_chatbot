@@ -16,7 +16,12 @@
 
 import subprocess
 import tempfile
-from .config_Heideltime import Heideltime_path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+Heideltime_path = os.getenv("HEIDELTIME_PATH")
 
 # calls the HeidelTime standalone application
 # documentation: https://gate.ac.uk/gate/plugins/Tagger_GATE-Time/doc/HeidelTime-Standalone-Manual.pdf
@@ -26,17 +31,19 @@ class Heideltime:
     def __init__(self):
         # assure that path to HeidelTime is in the correct format
         if Heideltime_path is None:
-            raise ValueError('Please specify the path to HeidelTime-standalone in config_Heideltime.py.')
-        elif Heideltime_path[-1] == '/':
+            raise ValueError(
+                "Please specify the path to HeidelTime-standalone in config_Heideltime.py."
+            )
+        elif Heideltime_path[-1] == "/":
             self.heidel_path = Heideltime_path[:-1]
         else:
             self.heidel_path = Heideltime_path
         self.document_time = None
-        self.language = 'ENGLISH'
-        self.doc_type = 'NARRATIVES'
-        self.output_type = 'TIMEML'
-        self.encoding = 'UTF-8'
-        self.config_file = self.heidel_path + '/config.props'
+        self.language = "ENGLISH"
+        self.doc_type = "NARRATIVES"
+        self.output_type = "TIMEML"
+        self.encoding = "UTF-8"
+        self.config_file = self.heidel_path + "/config.props"
 
         # this features are not tested and might not work
         self.verbosity = False
@@ -82,27 +89,39 @@ class Heideltime:
     def parse(self, document):
         # temporary file since HeidelTime standalone needs input file
         temp = tempfile.NamedTemporaryFile()
-        temp.write(document.encode('utf-8'))
+        temp.write(document.encode("utf-8"))
         temp.flush()
         # create string to execute in bash shell
-        inputs = ['java', '-jar', self.heidel_path + '/de.unihd.dbs.heideltime.standalone.jar', \
-                  '-l', self.language, '-t', self.doc_type, '-o', self.output_type,
-                  '-c', self.config_file, '-e', self.encoding]
+        inputs = [
+            "java",
+            "-jar",
+            self.heidel_path + "/de.unihd.dbs.heideltime.standalone.jar",
+            "-l",
+            self.language,
+            "-t",
+            self.doc_type,
+            "-o",
+            self.output_type,
+            "-c",
+            self.config_file,
+            "-e",
+            self.encoding,
+        ]
         # add all optional arguments
         if self.document_time:
-            inputs.append('-dct')
+            inputs.append("-dct")
             inputs.append(self.document_time)
         if self.verbosity:
-            inputs.append('-v')
+            inputs.append("-v")
         if self.interval_tagger:
-            inputs.append('-it')
+            inputs.append("-it")
         if self.locale:
-            inputs.append('-locale')
+            inputs.append("-locale")
             inputs.append(self.locale)
         if self.pos_tagger:
-            inputs.append('-pos')
+            inputs.append("-pos")
             inputs.append(self.pos_tagger)
         # lastly append the temporary file
         inputs.append(temp.name)
         # execute string in the bash shell
-        return subprocess.check_output(inputs).decode('utf-8')
+        return subprocess.check_output(inputs).decode("utf-8")

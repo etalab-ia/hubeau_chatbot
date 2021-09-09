@@ -5,5 +5,6 @@ stanford*
 .ipynb_checkpoints
 __pycache__
 venv
+.env
 model
 stacked-standard-flair-150-wikiner.pt*

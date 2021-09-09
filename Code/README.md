@@ -60,10 +60,11 @@ Download the stanza model
 python download_stanza_model.py
 ```
 
-In the directory Code/python_heideltime:
+Create a `.env` file and configure the absolute path to the heideltime runtime
 
-- In file **config_Heideltime** change the path _"/heideltime-standalone-2.2.1/heideltime-standalone"_
-  to _"your_folder/hubeau/inria/Code/heideltime-standalone-2.2.1/heideltime-standalone"_
+```
+HEIDELTIME_PATH = /Users/tk/code/hubeau_chatbot/Code/heideltime-standalone-2.2.1/heideltime-standalone
+```
 
 In the directory Code/heideltime-standalone-2.2.1:
 
