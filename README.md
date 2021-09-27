@@ -1,5 +1,7 @@
 The text below describes the steps to follow to be able to execute the code
 
+Original repository: https://github.com/BRGM/hubeau
+
 ## Docker
 
 ### Build image
