@@ -63,17 +63,6 @@ demonym_dict = {
     "regions": json.load(open("demonyms/Data/final/regs_stemmed_reversed.json")),
 }
 
-
-def load_ipaddress():
-    # Getting user's IP address
-    with requests.get("https://geolocation-db.com/json") as url:
-        data = json.loads(url.text)
-        return data["IPv4"]
-
-
-ip_address = load_ipaddress()
-
-
 st.header("Hub'eau Chatbot")
 st.markdown(
     """
@@ -341,7 +330,6 @@ if query != "" and submit_button:
         nb_mesures,
         all_locations,
         demonym_dict,
-        ip_address,
     )
 
     display_temporal_expressions(final_result, st)
